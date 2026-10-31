@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maritsalart — a fantasy novel</title>
+<meta name="description" content="Maritsalart — a fantasy novel, serialised chapter by chapter. Read it online, free.">
+<meta name="author" content="Varun Singh">
+<meta name="theme-color" content="#0E0E11">
+<link rel="canonical" href="https://botnet1109.github.io/maritsalart/">
+
+<meta property="og:type" content="book">
+<meta property="og:site_name" content="Maritsalart">
+<meta property="og:title" content="Maritsalart — a fantasy novel">
+<meta property="og:description" content="A fantasy story, serialised chapter by chapter. Read it online, free.">
+<meta property="og:url" content="https://botnet1109.github.io/maritsalart/">
+<meta property="og:image" content="https://botnet1109.github.io/maritsalart/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://botnet1109.github.io/maritsalart/og-image.png">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230E0E11'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='34' text-anchor='middle' fill='%23C9A96B'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<a class="skip" href="#chapters">Skip to chapters</a>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="./" id="brand">Maritsalart</a>
+    <ul class="topnav">
+      <li><a href="#chapters">Chapters</a></li>
+      <li class="hide-sm"><a href="#about">About</a></li>
+      <li><a href="#follow">Follow</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap">
+      <p class="genre" id="genre">Fantasy</p>
+      <h1 id="book-title">Maritsalart</h1>
+      <p class="byline" id="byline">by Varun Singh</p>
+      <p class="blurb" id="blurb"></p>
+      <div class="btns">
+        <a class="btn btn-solid" id="start-btn" href="chapter.html?ch=1">Start reading</a>
+        <a class="btn btn-ghost" href="#chapters">Table of contents</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="chapters">
+    <div class="wrap">
+      <p class="eyebrow">Contents</p>
+      <h2>Chapters</h2>
+      <ul class="toc" id="toc"></ul>
+      <noscript>
+        <p style="margin-top:20px">The chapter list needs JavaScript to build itself. Open <strong>chapter.html?ch=1</strong> directly to read.</p>
+      </noscript>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="wrap">
+      <p class="eyebrow">The author</p>
+      <h2>About</h2>
+      <div class="author-card">
+        <div class="author-mark" id="author-initial">V</div>
+        <div>
+          <h3 id="author-name">Varun Singh</h3>
+          <p id="author-bio">Writing fantasy, one chapter at a time. When I'm not working on the novel I fix computers for a living — that site is over at <a href="https://botnet1109.github.io/FixMyPC-Service/">FixMyPC Service</a>.</p>
+          <div class="author-links" id="author-links"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="follow">
+    <div class="wrap">
+      <p class="eyebrow">Stay in touch</p>
+      <h2>Follow along</h2>
+      <p>New chapters are posted here as they're finished. If you'd like to know when one goes up, or you want to tell me what you thought of the last one, email is the best way to reach me.</p>
+      <div class="btns" style="justify-content:flex-start" id="follow-btns"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>&copy; <span id="year">2026</span> <span id="foot-author">Varun Singh</span> &middot; <span id="foot-title">Maritsalart</span></p>
+  <p><a href="https://botnet1109.github.io/FixMyPC-Service/">FixMyPC Service</a></p>
+</footer>
+
+<script src="assets/chapters.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var STORE_LAST = "maritsalart:last";
+  var STORE_SCROLL = "maritsalart:scroll";
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  function wordCount(html) {
+    var text = String(html || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    return text ? text.split(" ").length : 0;
+  }
+
+  function minutes(html) {
+    var w = wordCount(html);
+    if (!w) return "";
+    return Math.max(1, Math.round(w / 220)) + " min read";
+  }
+
+  // ---- Book metadata ----
+  document.title = BOOK.title + " — a " + String(BOOK.genre || "").toLowerCase() + " novel";
+  document.getElementById("book-title").textContent = BOOK.title;
+  document.getElementById("brand").textContent = BOOK.title;
+  document.getElementById("genre").textContent = BOOK.genre;
+  document.getElementById("byline").textContent = "by " + BOOK.author;
+  document.getElementById("blurb").textContent = BOOK.blurb;
+  document.getElementById("author-name").textContent = BOOK.author;
+  document.getElementById("author-initial").textContent = (BOOK.author || "?").charAt(0).toUpperCase();
+  document.getElementById("foot-author").textContent = BOOK.author;
+  document.getElementById("foot-title").textContent = BOOK.title;
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // ---- Follow / contact buttons ----
+  var links = [];
+  if (BOOK.email) links.push({ href: "mailto:" + BOOK.email, label: "Email me", solid: true });
+  if (BOOK.youtube) links.push({ href: BOOK.youtube, label: "YouTube", solid: false });
+
+  var followBtns = document.getElementById("follow-btns");
+  followBtns.innerHTML = links.map(function (l) {
+    return '<a class="btn ' + (l.solid ? "btn-solid" : "btn-ghost") + '" href="' + esc(l.href) + '"' +
+      (l.href.indexOf("mailto:") === 0 ? "" : ' target="_blank" rel="noopener"') + '>' + esc(l.label) + '</a>';
+  }).join("");
+
+  document.getElementById("author-links").innerHTML = links.map(function (l) {
+    return '<a href="' + esc(l.href) + '"' + (l.href.indexOf("mailto:") === 0 ? "" : ' target="_blank" rel="noopener"') + '>' + esc(l.label) + '</a>';
+  }).join("");
+
+  // ---- Table of contents ----
+  var toc = document.getElementById("toc");
+  var chapters = (typeof CHAPTERS !== "undefined" ? CHAPTERS : []).slice().sort(function (a, b) { return a.n - b.n; });
+
+  if (!chapters.length) {
+    toc.outerHTML = '<div class="toc-empty">No chapters yet. Add one in <strong>assets/chapters.js</strong> — copy the example block, change the title and paste your text inside <em>body</em>.</div>';
+  } else {
+    toc.innerHTML = chapters.map(function (c) {
+      return '<li><a href="chapter.html?ch=' + c.n + '">' +
+        '<span class="num">' + (c.n < 10 ? "0" : "") + c.n + '</span>' +
+        '<span class="ttl">' + esc(c.title) + '</span>' +
+        '<span class="meta">' + esc(minutes(c.body)) + '</span>' +
+      '</a></li>';
+    }).join("");
+  }
+
+  // ---- Continue reading, if they've been here before ----
+  var last = null;
+  try { last = parseInt(localStorage.getItem(STORE_LAST), 10); } catch (e) {}
+  if (last) {
+    var match = chapters.filter(function (c) { return c.n === last; })[0];
+    if (match) {
+      var btn = document.getElementById("start-btn");
+      btn.textContent = "Continue — " + match.title;
+      btn.href = "chapter.html?ch=" + last + "&resume=1";
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
