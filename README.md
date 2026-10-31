@@ -69,7 +69,9 @@ Changing `title`, `author` or `blurb` updates the front page, the reader header 
 
 ## Notes
 
-The two chapters currently in `chapters.js` are **placeholder text**, there so the reader has something to render. Replace them with real writing — and if you add or remove chapters, update `sitemap.xml` to match.
+The two chapters currently in `chapters.js` are **placeholder text**, there so the reader has something to render. Replace them with real writing.
+
+You don't need to touch `sitemap.xml` when you add or remove chapters — every chapter is served by the same `chapter.html` page, and that single URL is already listed in the sitemap.
 
 The site assumes it lives at `/maritsalart/`. If you rename the repo, update the `canonical` and `og:url` tags in `index.html`, the paths in `404.html`, and the URLs in `robots.txt` and `sitemap.xml`.
 
