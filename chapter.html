@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter — Maritsalart</title>
+<meta name="description" content="Read Maritsalart, a fantasy novel, chapter by chapter.">
+<meta name="theme-color" content="#0E0E11">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230E0E11'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='34' text-anchor='middle' fill='%23C9A96B'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<div class="progress-track"><div class="progress-bar" id="progress"></div></div>
+
+<a class="skip" href="#text">Skip to chapter text</a>
+
+<header class="reader-bar">
+  <div class="reader-bar-inner">
+    <a class="back-link" href="./">&larr; Contents</a>
+    <span class="chapter-label" id="chapter-label"></span>
+    <div class="reader-tools">
+      <button class="tool" id="font-smaller" type="button" aria-label="Decrease text size">A&minus;</button>
+      <button class="tool" id="font-larger" type="button" aria-label="Increase text size">A+</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <article class="chapter">
+    <div class="wrap-narrow">
+      <header class="chapter-head">
+        <p class="kicker" id="kicker"></p>
+        <h1 id="chapter-title">Chapter</h1>
+        <p class="sub" id="chapter-sub"></p>
+      </header>
+
+      <div class="prose" id="text"></div>
+
+      <div class="chapter-end">
+        <p class="end-mark">&middot; &middot; &middot;</p>
+        <nav class="chapter-nav">
+          <a class="btn btn-ghost" id="prev" href="#">&larr; Previous</a>
+          <a class="btn btn-solid" id="next" href="#">Next chapter &rarr;</a>
+        </nav>
+      </div>
+    </div>
+  </article>
+
+  <p class="reader-foot">
+    Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between chapters, <kbd>Esc</kbd> for the contents.
+  </p>
+</main>
+
+<script src="assets/chapters.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var STORE_LAST = "maritsalart:last";
+  var STORE_SCROLL = "maritsalart:scroll";
+  var STORE_SIZE = "maritsalart:size";
+  var DEFAULT_SIZE = 1.14;   // rem
+  var MIN_SIZE = 0.95, MAX_SIZE = 1.55, STEP = 0.08;
+
+  var chapters = (typeof CHAPTERS !== "undefined" ? CHAPTERS : []).slice()
+    .sort(function (a, b) { return a.n - b.n; });
+
+  var params = new URLSearchParams(window.location.search);
+  var wanted = parseInt(params.get("ch"), 10);
+  var resume = params.get("resume") === "1";
+
+  var idx = -1;
+  for (var i = 0; i < chapters.length; i++) {
+    if (chapters[i].n === wanted) { idx = i; break; }
+  }
+  var chapter = idx >= 0 ? chapters[idx] : null;
+
+  // ---- Nothing to show ----
+  if (!chapter) {
+    document.getElementById("kicker").textContent = "";
+    document.getElementById("chapter-title").textContent = "Chapter not found";
+    document.getElementById("chapter-sub").textContent = "";
+    document.getElementById("text").innerHTML =
+      '<p>There is no chapter at that address. <a href="./">Go back to the contents</a> to pick one.</p>';
+    document.getElementById("prev").style.display = "none";
+    document.getElementById("next").style.display = "none";
+    document.getElementById("chapter-label").textContent = "";
+    return;
+  }
+
+  // ---- Render the chapter ----
+  document.title = "Chapter " + chapter.n + " — " + chapter.title + " · " + BOOK.title;
+  document.getElementById("kicker").textContent = "Chapter " + chapter.n;
+  document.getElementById("chapter-title").textContent = chapter.title;
+  document.getElementById("chapter-sub").textContent = chapter.subtitle || "";
+  document.getElementById("chapter-label").textContent = BOOK.title + " · " + chapter.n + " of " + chapters.length;
+  document.getElementById("text").innerHTML = chapter.body || "";
+
+  // ---- Prev / next ----
+  var prev = document.getElementById("prev");
+  var next = document.getElementById("next");
+  var prevCh = chapters[idx - 1];
+  var nextCh = chapters[idx + 1];
+
+  if (prevCh) {
+    prev.href = "chapter.html?ch=" + prevCh.n;
+    prev.innerHTML = "&larr; " + prevCh.title;
+  } else {
+    prev.setAttribute("disabled", "");
+    prev.href = "#";
+  }
+
+  if (nextCh) {
+    next.href = "chapter.html?ch=" + nextCh.n;
+    next.innerHTML = nextCh.title + " &rarr;";
+  } else {
+    next.href = "./";
+    next.innerHTML = "Back to contents";
+  }
+
+  // ---- Remember where they got to ----
+  try {
+    localStorage.setItem(STORE_LAST, String(chapter.n));
+  } catch (e) {}
+
+  // ---- Font size ----
+  function applySize(rem) {
+    document.documentElement.style.setProperty("--reader-size", rem.toFixed(2) + "rem");
+    try { localStorage.setItem(STORE_SIZE, String(rem)); } catch (e) {}
+  }
+
+  var size = DEFAULT_SIZE;
+  try {
+    var saved = parseFloat(localStorage.getItem(STORE_SIZE));
+    if (saved && saved >= MIN_SIZE && saved <= MAX_SIZE) size = saved;
+  } catch (e) {}
+  applySize(size);
+
+  document.getElementById("font-smaller").addEventListener("click", function () {
+    size = Math.max(MIN_SIZE, size - STEP); applySize(size);
+  });
+  document.getElementById("font-larger").addEventListener("click", function () {
+    size = Math.min(MAX_SIZE, size + STEP); applySize(size);
+  });
+
+  // ---- Reading progress bar ----
+  var bar = document.getElementById("progress");
+  function updateProgress() {
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - window.innerHeight;
+    var pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+    bar.style.width = Math.min(100, Math.max(0, pct)) + "%";
+  }
+  updateProgress();
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress);
+
+  // ---- Save scroll position, so "Continue reading" returns here ----
+  var saveTimer = null;
+  window.addEventListener("scroll", function () {
+    if (saveTimer) return;
+    saveTimer = setTimeout(function () {
+      saveTimer = null;
+      try {
+        var all = JSON.parse(localStorage.getItem(STORE_SCROLL) || "{}");
+        all[chapter.n] = Math.round(window.scrollY);
+        localStorage.setItem(STORE_SCROLL, JSON.stringify(all));
+      } catch (e) {}
+    }, 400);
+  }, { passive: true });
+
+  if (resume) {
+    var restore = 0;
+    try {
+      var store = JSON.parse(localStorage.getItem(STORE_SCROLL) || "{}");
+      restore = store[chapter.n] || 0;
+    } catch (e) {}
+    if (restore > 80) {
+      window.addEventListener("load", function () { window.scrollTo(0, restore); });
+    }
+  }
+
+  // ---- Keyboard navigation ----
+  document.addEventListener("keydown", function (e) {
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (e.key === "ArrowLeft" && prevCh) { window.location.href = prev.href; }
+    if (e.key === "ArrowRight") { window.location.href = next.href; }
+    if (e.key === "Escape") { window.location.href = "./"; }
+  });
+})();
+</script>
+
+</body>
+</html>
